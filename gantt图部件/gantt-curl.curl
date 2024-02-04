@@ -1,0 +1,24 @@
+A 状态改变命令
+curl -v -X POST http://123.60.3.16:8080/api/v1/5a0Tk6HLNy80zEZ5oaT4/telemetry --header Content-Type:application/json --data "{EquipmentProcessingState:'SETUP'}"
+
+curl -v -X POST http://123.60.3.16:8080/api/v1/5a0Tk6HLNy80zEZ5oaT4/telemetry --header Content-Type:application/json --data "{EquipmentProcessingState:'IDLE'}"
+
+curl -v -X POST http://123.60.3.16:8080/api/v1/5a0Tk6HLNy80zEZ5oaT4/telemetry --header Content-Type:application/json --data "{EquipmentProcessingState:'DOWN'}"
+
+
+B 状态改变命令
+curl -v -X POST http://123.60.3.16:8080/api/v1/HrotZgaNMArtNAo3DqGp/telemetry --header Content-Type:application/json --data "{EquipmentProcessingState:'RUN'}"
+
+curl -v -X POST http://123.60.3.16:8080/api/v1/HrotZgaNMArtNAo3DqGp/telemetry --header Content-Type:application/json --data "{EquipmentProcessingState:'DOWN'}"
+
+
+
+
+C 设备改变状态命令
+curl -v -X POST http://123.60.3.16:8080/api/v1/pySi9x0qEhrjCUAQK9rY/telemetry --header Content-Type:application/json --data "{EquipmentProcessingState:'DOWN'}"
+
+curl -v -X POST http://123.60.3.16:8080/api/v1/pySi9x0qEhrjCUAQK9rY/telemetry --header Content-Type:application/json --data "{EquipmentProcessingState:'RUN'}"
+
+
+
+curl -v -X POST http://123.60.3.16:8080/api/v1/pySi9x0qEhrjCUAQK9rY/telemetry --header Content-Type:application/json --data "{EquipmentProcessingState:'IDLE'}"

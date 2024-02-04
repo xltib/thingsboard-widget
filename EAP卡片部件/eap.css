@@ -1,0 +1,174 @@
+.card {
+    width: 100%;
+    height: 100%;
+    padding: 20px 20px 40px 20px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.run-state,
+.down-state,
+.setup-state,
+.idle-state {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #89d96a;
+    font-weight: 400;
+}
+
+.run-state svg {
+    width: 30px;
+    height: 30px;
+    margin-right: 4px;
+}
+
+.down-state {
+    color: #cf1120;
+}
+
+.setup-state {
+    color: #fad0df;
+}
+
+.idle-state {
+    color: #95d6fa;
+}
+
+.down-state svg {
+    width: 30px;
+    height: 30px;
+    margin-right: 4px;
+}
+
+.setup-state svg {
+    width: 30px;
+    height: 30px;
+    margin-right: 4px;
+}
+
+.idle-state svg {
+    width: 30px;
+    height: 30px;
+    margin-right: 4px;
+}
+
+/*content start */
+
+
+.just-wrapper {
+max-height: calc(100% - 55px);
+    overflow: scroll;
+}
+.card-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.left-box {
+    width: 58%;
+}
+
+.right-box {
+    width: 40%;
+  
+}
+
+
+.left-box,
+.right-box {
+    border: 1px solid #d8d8d8;
+    padding: 6px;
+    height: calc(100% - 12px);
+      
+}
+
+.process-info {
+    background: #38557e;
+    color: #fff;
+    text-align: center;
+    padding: 5px;
+    font-size: 12px;
+}
+
+/* left-box*/
+.cus-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px;
+}
+
+.cus-row>div {
+    width: 30%;
+}
+
+.list-header {
+    font-size: 12px;
+    color:rgba(0, 0, 0, .54);
+    
+}
+
+.list-content {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.list-content:nth-child(odd) {
+    background-color:#f9fafb;
+}
+
+.list-content  div:nth-child(2){
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: normal;
+}
+
+/* right panel*/
+
+.alarm-header svg{
+    width: 24px;
+    height: 22px;
+}
+
+.alarm-header{
+   color: #cf1120;
+   line-height: 25px;
+   height: 25px;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+} 
+
+.alarm-content {
+    height: calc(100% - 25px);
+    overflow: scroll;
+}
+
+.alarm-item {
+    background:#f5f6f8;
+    padding: 14px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+
+/*empty page*/
+.empty-data{
+    color: #ccc;
+    text-align: center;
+    
+}

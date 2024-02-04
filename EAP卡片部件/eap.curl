@@ -1,0 +1,58 @@
+
+### 数据格式 
+- LotStart             `{ "LotStart": {"LotID": 1,"LotStartQuantity": 3,"ProductID": 1001,"RecipeID": 3212} }`       
+- LotEnd               `{ "LotEnd": {"LotID": 1,"LotEndQuantity": 3,"ProductID": 1001,"RecipeID": 3212} }`		        
+- AlarmSet             `{ "AlarmSet": {"AlarmID": "123456", "AlarmText": "Temperature exceeds threshold"} }`		        
+- AlarmClear           `{ "AlarmClear": {"AlarmID": "123456", "AlarmText": "Temperature exceeds threshold"} }`
+- ProductCount         `{ "ProductCount": {"LotID": 1, "ProductionCount": 10 } }   //每种设备每十五秒上报已生产的数`
+- MESEquipmentState    `{ "MESEquipmentState": "Productive Time"}`
+- EquipmentProcessingState   `{"EquipmentProcessingState": "SETUP"}`
+- LotState  `{"LotState":{"LotID":"批次A","State":"InProcess","RecipeID":"ILK4K"}`
+
+### MESEquipmentState   
+- Productive Time  
+- Standby Time
+- Scheduled Downtime    
+- Unscheduled Downtime
+- Non-Scheduled Time
+- Engineering Time
+- Sick
+
+### EquipmentProcessingState 
+- IDLE
+- RUN
+- SETUP
+- DOWN
+
+
+<!-- 清空device 1 -->
+curl -v -X POST http://123.60.3.16:8080/api/v1/snFDtUNjB4p9MqukpWFK/telemetry --header Content-Type:application/json --data "{"LotState":{"LotID":"批次A","State":"InProcess","RecipeID":"ILK4K"}"
+
+curl -v -X POST http://123.60.3.16:8080/api/v1/snFDtUNjB4p9MqukpWFK/telemetry --header Content-Type:application/json --data "{LotState:"9999999jiuiygdsahyuk"}"
+
+<!-- 清空device 2 -->
+curl -v -X POST http://123.60.3.16:8080/api/v1/8W6HkuSm3CGkwlz2tslg/telemetry --header Content-Type:application/json --data "{"deviceData":{"EquipmentProcessingState":null,"processData":[]}}"
+
+
+<!-- device 1 发数据命令 -->
+curl -v -X POST http://123.60.3.16:8080/api/v1/snFDtUNjB4p9MqukpWFK/telemetry --header Content-Type:application/json --data "{"deviceData":{"EquipmentProcessingState":"RUN","processData":[{"LotState":{"LotID":"批次A","State":"InProcess","RecipeID":"ILK4K"},"AlarmSet":{"AlarmID":"123456","AlarmText":"机器过热"},"ProductCount":{"LotID":"批次A","ProductionCount":10}},{"LotState":{"LotID":"批次B","State":"InProcess","RecipeID":"ZZZ"},"AlarmSet":{"AlarmID":"9999","AlarmText":"Errorhere"},"ProductCount":{"LotID":"批次B","ProductionCount":90}}]}}"
+
+<!-- device 1 去1条alarm  多条lot -->
+
+curl -v -X POST http://123.60.3.16:8080/api/v1/snFDtUNjB4p9MqukpWFK/telemetry --header Content-Type:application/json --data "{"deviceData":{"EquipmentProcessingState":"RUN","processData":[{"LotState":{"LotID":"批次A","State":"InProcess","RecipeID":"ILK4K"},"AlarmSet":{"AlarmID":"123456","AlarmText":"机器过热"},"AlarmClear":{"AlarmID":"123456","AlarmText":"机器过热"},"ProductCount":{"LotID":"批次A","ProductionCount":10}},{"LotState":{"LotID":"批次B","State":"InProcess","RecipeID":"ZZZ"},"AlarmSet":{"AlarmID":"9999","AlarmText":"Errorhere"},"ProductCount":{"LotID":"批次B","ProductionCount":90}},{"LotState":{"LotID":"批次C","State":"InProcess","RecipeID":"配方一"},"ProductCount":{"LotID":"批次C","ProductionCount":90}},{"LotState":{"LotID":"批次D","State":"InProcess","RecipeID":"配方二"},"ProductCount":{"LotID":"批次D","ProductionCount":90}},{"LotState":{"LotID":"批次E","State":"InProcess","RecipeID":"配方三"},"ProductCount":{"LotID":"批次E","ProductionCount":90},"AlarmSet":{"AlarmID":"2","AlarmText":"缺水"}},{"LotState":{"LotID":"批次F","State":"InProcess","RecipeID":"配方三"},"ProductCount":{"LotID":"批次F","ProductionCount":90},"AlarmSet":{"AlarmID":"2","AlarmText":"红灯异常"}}]}}"
+
+<!-- device 1 alarm 更改 -->
+curl -v -X POST http://123.60.3.16:8080/api/v1/snFDtUNjB4p9MqukpWFK/telemetry --header Content-Type:application/json --data "{"deviceData":{"EquipmentProcessingState":"RUN","processData":[{"LotState":{"LotID":"批次A","State":"InProcess","RecipeID":"ILK4K"},"AlarmSet":{"AlarmID":"123456","AlarmText":"机器过热"},"AlarmClear":{"AlarmID":"123456","AlarmText":"机器过热"},"ProductCount":{"LotID":"批次A","ProductionCount":10}},{"LotState":{"LotID":"批次B","State":"InProcess","RecipeID":"ZZZ"},"AlarmSet":{"AlarmID":"88","AlarmText":"机器进水"},"ProductCount":{"LotID":"批次B","ProductionCount":90}},{"LotState":{"LotID":"批次C","State":"InProcess","RecipeID":"配方一"},"ProductCount":{"LotID":"批次C","ProductionCount":90}}]}}"
+
+
+
+<!-- device 2 机台状态down -->
+
+curl -v -X POST http://123.60.3.16:8080/api/v1/8W6HkuSm3CGkwlz2tslg/telemetry --header Content-Type:application/json --data "{"deviceData":{"EquipmentProcessingState":"DOWN","processData":[{"LotState":{"LotID":"2号a批","State":"InProcess","RecipeID":"ILK4K"},"AlarmSet":{"AlarmID":"123456","AlarmText":"机器过热"},"ProductCount":{"LotID":"2号a批","ProductionCount":10},"AlarmClear":{"AlarmID":"123456","AlarmText":"机器过热"}},{"LotState":{"LotID":"2号b批","State":"InProcess","RecipeID":"ZZZ"},"AlarmSet":{"AlarmID":"告警","AlarmText":"出错！"},"ProductCount":{"LotID":"2号b批","ProductionCount":90}}]}}"
+
+
+
+
+
+
+curl -v -X POST http://123.60.3.16:8080/api/v1/8W6HkuSm3CGkwlz2tslg/telemetry --header Content-Type:application/json --data "{temperature:25}"
