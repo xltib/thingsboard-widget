@@ -1,5 +1,3 @@
-// js
-
 var myChart;
 var HEIGHT_RATIO = 0.6;
 var DIM_CATEGORY_INDEX = 0;
@@ -21,16 +19,7 @@ var _rawData = {
             "Name",
         ],
         "data": [
-            [
-                "E",
-            ],
-            [
-                "D",
-            ],
-            [
-                "C",
-            ]
-        
+           
         ]
     },
     // - IDLE
@@ -46,23 +35,7 @@ var _rawData = {
             "设备"
         ],
         "data": [
-            
-            [
-                "",
-                1706732058000,
-                1706736258000,
-                "IDLE",
-                "D"
-            ],
-            [
-                "",
-                1706736258000,
-                1706739258000,
-                "RUN",
-                "E"
-            ],
-
-
+           
         ]
     }
 }
@@ -310,12 +283,12 @@ self.onInit = function() {
     // show option
     myChart.setOption((option = makeOption()));
 
-    console.log('init： ', self.ctx.defaultSubscription
-        .data);
+    // console.log('init： ', self.ctx.defaultSubscription
+    //     .data);
     self.ctx.$scope.states = self.ctx
         .defaultSubscription.data;
         
-        
+    refreshGraph();    
         
  
 }
@@ -401,16 +374,3 @@ function refreshGraph() {
     // show option
     myChart.setOption((option = makeOption()));
 }
-
-
-//  js end 
-
-
-// html start 
-<div id="myChart" ></div>
-// html end 
-
-
-
-// import 3rd 
-https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js
