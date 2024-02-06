@@ -19,7 +19,7 @@ var _rawData = {
             "Name",
         ],
         "data": [
-           
+
         ]
     },
     // - IDLE
@@ -35,7 +35,7 @@ var _rawData = {
             "设备"
         ],
         "data": [
-           
+
         ]
     }
 }
@@ -146,8 +146,8 @@ function makeOption() {
             },
             name: '设备',
             nameTextStyle: {
-                  fontWeight: 800,
-                  fontSize: 14,
+                fontWeight: 800,
+                fontSize: 14,
             },
             // nameLocation: 'end',
             min: 0,
@@ -287,10 +287,10 @@ self.onInit = function() {
     //     .data);
     self.ctx.$scope.states = self.ctx
         .defaultSubscription.data;
-        
-    refreshGraph();    
-        
- 
+
+    refreshGraph();
+
+
 }
 
 
@@ -301,11 +301,12 @@ self.onResize = function() {
     myChart.resize({
         width: self.ctx.width,
         // height: self.ctx.data.length * 40 + 100,
-          height: self.ctx.height
+        height: self.ctx.height
     })
 }
 
 self.onDataUpdated = function() {
+
     let obj = {};
     if (self.ctx.$scope.states) {
         for (let device of self.ctx.$scope.states) {
@@ -316,13 +317,13 @@ self.onDataUpdated = function() {
     let prev = JSON.parse(localStorage.getItem(
         'deviceData'));
 
-// Received data has been changed or not
+    // Received data has been changed or not
     if (isChange(prev, obj)) {
-      
+
     } else {
-      
+
         refreshGraph();
-        
+
     }
     localStorage.setItem('deviceData', JSON.stringify(
         obj));
@@ -337,7 +338,7 @@ function isChange(x, y) {
 
 
 function refreshGraph() {
-    console.log('mutation', self.ctx.$scope.states)
+
     const updateData = self.ctx.$scope.states;
     const chartData = {
         "deviceID": {
@@ -357,20 +358,76 @@ function refreshGraph() {
             "data": []
         }
     }
+    let deviceUniqueStates = new Set();
     for (let device of updateData) {
-        chartData.deviceID.data.push([device.datasource.entityName])
+        chartData.deviceID.data.push([device.datasource
+            .entityName
+        ])
         for (let i = 0; i < device.data.length - 1; i++) {
             chartData.device.data.push([
                 '',
                 device.data[i][0],
                 device.data[i + 1][0],
-                device.data[i][1],
+                device.data[i][1]
+                .toUpperCase(), // 状态转大写
                 device.datasource.entityName
             ])
+            deviceUniqueStates.add(device.data[i][1]);
         }
     }
-    
+
+
     _rawData = chartData;
+    // Generate Color according to customs' state
+    updateColorParam(deviceUniqueStates);
     // show option
     myChart.setOption((option = makeOption()));
+}
+
+
+
+// 传入状态数组
+function updateColorParam(state_list) {
+    // 颜色随机数
+
+    for (let value of state_list.values()) {
+
+        switch (value) {
+            case 'IDLE':
+                COLORS['IDLE'] = "#929292";
+                break;
+            case 'RUN':
+                COLORS['RUN'] = "#82C303";
+                break;
+            case 'SETUP':
+                COLORS['SETUP'] = "#FEFE2A";
+                break;
+            case 'DOWN':
+                COLORS['SETUP'] = "#DD273E";
+                break;
+            default:
+                let color;
+                do {
+                    color = '#' + Math.random()
+                        .toString(16).substr(
+                            2,
+                            6);
+                    console.log(color)
+
+                } while (color === '#929292' || color ===
+                    '#82C303' || color === '#FEFE2A' ||
+                    color === '#DD273E')
+
+                // let color = '#' + Math.random()
+                //     .toString(16).substr(
+                //         2,
+                //         6);
+                // console.log(color)
+                COLORS[value] = color;
+        }
+    }
+
+    console.log(COLORS)
+    console.log(_rawData)
+
 }
