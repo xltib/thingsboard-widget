@@ -372,7 +372,10 @@ function refreshGraph() {
                 .toUpperCase(), // 状态转大写
                 device.datasource.entityName
             ])
-            deviceUniqueStates.add(device.data[i][1]);
+
+            let device_state = device.data[i][1] ? device
+                .data[i][1].toUpperCase() : device.data[i][1]; 
+            deviceUniqueStates.add(device_state);
         }
     }
 
@@ -388,8 +391,7 @@ function refreshGraph() {
 
 // 传入状态数组
 function updateColorParam(state_list) {
-    // 颜色随机数
-
+    // Random color value
     for (let value of state_list.values()) {
 
         switch (value) {
@@ -412,7 +414,6 @@ function updateColorParam(state_list) {
                         .toString(16).substr(
                             2,
                             6);
-                    console.log(color)
 
                 } while (color === '#929292' || color ===
                     '#82C303' || color === '#FEFE2A' ||
@@ -427,7 +428,5 @@ function updateColorParam(state_list) {
         }
     }
 
-    console.log(COLORS)
-    console.log(_rawData)
 
 }
