@@ -12,3 +12,5 @@ ii.如果舍弃timeSeries类型， 转用Latest类型，能在数据变化时才
 还没有实现 用户在界面上给状态值自定义颜色。经过调研发现：
 timeseries table的data key configration 界面有一个开关，打开后，可以根据值改变字体颜色，与你提的需求类似，我准备朝这个方向尝试。但是我的组件里data key configration界面没有这个开关。请问配置哪里有问题
 
+2
+
