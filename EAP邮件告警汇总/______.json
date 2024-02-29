@@ -1,0 +1,206 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": "测试的"
+    },
+    "name": "同步设备数据",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 6,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 836,
+          "layoutY": 166
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbChangeOriginatorNode",
+        "name": "change originator",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "originatorSource": "RELATED",
+          "entityType": null,
+          "entityNamePattern": null,
+          "relationsQuery": {
+            "fetchLastLevelOnly": false,
+            "direction": "TO",
+            "maxLevel": 1,
+            "filters": [
+              {
+                "relationType": "Contains",
+                "entityTypes": [
+                  "ASSET"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "获取设备的ip、区域、所属模组",
+          "layoutX": 540,
+          "layoutY": 159
+        },
+        "type": "org.thingsboard.rule.engine.metadata.TbGetAttributesNode",
+        "name": "originator attributes",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 1,
+        "configuration": {
+          "tellFailureIfAbsent": true,
+          "fetchTo": "METADATA",
+          "clientAttributeNames": [],
+          "sharedAttributeNames": [],
+          "serverAttributeNames": [
+            "ip",
+            "area",
+            "belongTo"
+          ],
+          "latestTsKeyNames": [],
+          "getLatestValueWithTs": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "获取连接状态，告警信息",
+          "layoutX": 1136,
+          "layoutY": 165
+        },
+        "type": "org.thingsboard.rule.engine.metadata.TbGetAttributesNode",
+        "name": "originator attributes",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 1,
+        "configuration": {
+          "tellFailureIfAbsent": true,
+          "fetchTo": "METADATA",
+          "clientAttributeNames": [],
+          "sharedAttributeNames": [],
+          "serverAttributeNames": [
+            "alarmsInfo",
+            "deviceAttr"
+          ],
+          "latestTsKeyNames": [],
+          "getLatestValueWithTs": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "同步设备信息",
+          "layoutX": 1443,
+          "layoutY": 172
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "同步设备信息",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "scriptLang": "JS",
+          "jsScript": "//构建格式样例：{\"MA02-MODULEXRAY02-A\":{\"ip\":\"\",area:\"\",module:\"\"}}\n\nvar deviceName = metadata.deviceName;\nvar alarmsInfo = metadata.ss_alarmsInfo;\nif(alarmsInfo != undefined){\n    alarmsInfo = JSON.parse(alarmsInfo);\n}else{\n    alarmsInfo = {\"info\": []};\n}\nvar info = {};\ninfo['name'] = deviceName\ninfo['state'] = msg.EquipmentState\ninfo['ts'] = Date.now();\nif (alarmsInfo.info.length == 0){\n    alarmsInfo.info.push(info)\n} else {\n    var flag = true;\n    for (var i = 0; i < alarmsInfo.info.length; i++){\n        if (deviceName == alarmsInfo.info[i].name){\n            flag = false;\n            if (info['state'] != alarmsInfo.info[i].state){\n                alarmsInfo.info[i].state = msg.EquipmentState;\n                alarmsInfo.info[i].ts = info['ts'];\n            }\n        }\n    }\n    if (flag){\n        alarmsInfo.info.push(info);\n    }\n}\n\nvar msg = {alarmsInfo:alarmsInfo};\nreturn {msg: msg, metadata: metadata, msgType: 'POST_ATTRIBUTES_REQUEST'};",
+          "tbelScript": "return {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "同步EquipmentState",
+          "layoutX": 1204,
+          "layoutY": 337
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "同步EquipmentState",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "scriptLang": "JS",
+          "jsScript": "//构建格式样例：{\"MA02-MODULEXRAY02-A\":{\"state\":connect,\"ts\":179998888}, ... }\n\nvar deviceName = metadata.deviceName;\nvar ip = metadata.ss_ip;\nvar belongTo = metadata.ss_belongTo;\nvar area = metadata.ss_area;\nvar data = {};\ndata['ip'] = ip;\ndata['belongTo'] = belongTo;\ndata['area'] = area;\n\nvar deviceAttr = metadata.ss_deviceAttr;\nif(deviceAttr != undefined){\n    deviceAttr = JSON.parse(deviceAttr);\n}else{\n    deviceAttr = {};\n}\ndeviceAttr[deviceName]=data;\nvar msg = {deviceAttr:deviceAttr};\nreturn {msg: msg, metadata: metadata, msgType: 'POST_ATTRIBUTES_REQUEST'};",
+          "tbelScript": "return {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1587,
+          "layoutY": 447
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgAttributesNode",
+        "name": "save attributes",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 2,
+        "configuration": {
+          "scope": "SERVER_SCOPE",
+          "notifyDevice": false,
+          "sendAttributesUpdatedNotification": false,
+          "updateAttributesOnlyOnValueChange": true
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 279,
+          "layoutY": 154
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeFilterNode",
+        "name": "filter",
+        "debugMode": false,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "messageTypes": [
+            "POST_ATTRIBUTES_REQUEST",
+            "POST_TELEMETRY_REQUEST",
+            "TO_SERVER_RPC_REQUEST"
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 2,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 0,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 3,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 6,
+        "toIndex": 1,
+        "type": "True"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}

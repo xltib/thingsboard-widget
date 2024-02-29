@@ -1,0 +1,104 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": ""
+    },
+    "name": "告警汇总默认",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 2,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 581,
+          "layoutY": 235
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbJsSwitchNode",
+        "name": "分流",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "scriptLang": "JS",
+          "jsScript": "if(msg.AlarmReportEvent) {\n    return ['AlarmReportEvent'];\n}\nif(msg.EquipmentState) {\n    return ['deviceAttr'];\n}\nreturn ['default']",
+          "tbelScript": "function nextRelation(metadata, msg) {\n    return ['one','nine'];\n}\nif(msgType == 'POST_TELEMETRY_REQUEST') {\n    return ['two'];\n}\nreturn nextRelation(metadata, msg);"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 979,
+          "layoutY": 344
+        },
+        "type": "org.thingsboard.rule.engine.flow.TbRuleChainInputNode",
+        "name": "email alarm rule",
+        "debugMode": false,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "ruleChainId": "cdf522e0-d5dc-11ee-9544-d39eccd5db7a"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 340,
+          "layoutY": 197
+        },
+        "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+        "name": "device",
+        "debugMode": false,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "persistAlarmRulesState": false,
+          "fetchAlarmRulesStateOnStart": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1017,
+          "layoutY": 118
+        },
+        "type": "org.thingsboard.rule.engine.flow.TbRuleChainInputNode",
+        "name": "save data",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "ruleChainId": "eab46b10-d60f-11ee-9544-d39eccd5db7a"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "AlarmReportEvent"
+      },
+      {
+        "fromIndex": 0,
+        "toIndex": 3,
+        "type": "alarmsInfo"
+      },
+      {
+        "fromIndex": 0,
+        "toIndex": 3,
+        "type": "deviceAttr"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 0,
+        "type": "Success"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
