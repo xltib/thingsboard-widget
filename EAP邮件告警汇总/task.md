@@ -16,12 +16,9 @@
 自定义server attribute：
 areaName  belongTo ip deviceType
 
-2. EAP告警汇总事件   `{"AlarmReportEvent":""}`  接收到这个AlarmReportEvent属性， 就把所有的设备数据汇总计算出来，并发送email表格？
 
 
 
-建立三个device => 关联到一个资产=> 对应的资产profile 关联 发送邮件的rule
-change 
 
 
 deviceInfo
@@ -32,8 +29,8 @@ EAPConnectState
 {"MA02-MODULEXRAY02-A":{"state":"disconnect","ts":"1709091725136"},"MA02-XRAY01":{"state":"connect","ts":"1709091086240"}}
 
 
-
+准备条件：
 1。 资产的初始化格式必须有 {info:[]} 
-2。 发送告警事件 { xxx : 1}
-3。 设备类型是啥
+2。 发送告警事件 { AlarmReportEvent : 1}
+3。 设备的服务端属性： area(区域)； belongTo（所属模组）； ip(部署IP); state（状态）；
 

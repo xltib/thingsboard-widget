@@ -16,8 +16,8 @@
       {
         "additionalInfo": {
           "description": "",
-          "layoutX": 581,
-          "layoutY": 235
+          "layoutX": 639,
+          "layoutY": 200
         },
         "type": "org.thingsboard.rule.engine.filter.TbJsSwitchNode",
         "name": "分流",
@@ -26,19 +26,19 @@
         "configurationVersion": 0,
         "configuration": {
           "scriptLang": "JS",
-          "jsScript": "if(msg.AlarmReportEvent) {\n    return ['AlarmReportEvent'];\n}\nif(msg.EquipmentState) {\n    return ['deviceAttr'];\n}\nreturn ['default']",
+          "jsScript": "if(msg.AlarmReportEvent) {\n    return ['AlarmReportEvent'];\n}\nif(msg.EquipmentState || msg.EAPConnectState || msg.EDCIsOk != undefined) {\n    return ['deviceAttr'];\n}\nif(msg.MESErrorInfo) {\n    return ['mesErrorInfo'];\n}\nif(msg.EDCInfo){\n    return ['edcInfo'];\n}\nif(msg.AlarmSet || msg.AlarmClear) {\n    return ['resourceAlarm'];\n}\nreturn ['Default'];",
           "tbelScript": "function nextRelation(metadata, msg) {\n    return ['one','nine'];\n}\nif(msgType == 'POST_TELEMETRY_REQUEST') {\n    return ['two'];\n}\nreturn nextRelation(metadata, msg);"
         }
       },
       {
         "additionalInfo": {
           "description": "",
-          "layoutX": 979,
-          "layoutY": 344
+          "layoutX": 1015,
+          "layoutY": 233
         },
         "type": "org.thingsboard.rule.engine.flow.TbRuleChainInputNode",
         "name": "email alarm rule",
-        "debugMode": false,
+        "debugMode": true,
         "singletonMode": false,
         "configurationVersion": 0,
         "configuration": {
@@ -64,8 +64,8 @@
       {
         "additionalInfo": {
           "description": "",
-          "layoutX": 1017,
-          "layoutY": 118
+          "layoutX": 1013,
+          "layoutY": 139
         },
         "type": "org.thingsboard.rule.engine.flow.TbRuleChainInputNode",
         "name": "save data",
@@ -74,6 +74,51 @@
         "configurationVersion": 0,
         "configuration": {
           "ruleChainId": "eab46b10-d60f-11ee-9544-d39eccd5db7a"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1017,
+          "layoutY": 322
+        },
+        "type": "org.thingsboard.rule.engine.flow.TbRuleChainInputNode",
+        "name": "mesErrorInfo",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "ruleChainId": "7c0e03b0-d6d7-11ee-9544-d39eccd5db7a"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1024,
+          "layoutY": 447
+        },
+        "type": "org.thingsboard.rule.engine.flow.TbRuleChainInputNode",
+        "name": "edcInfo",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "ruleChainId": "438b24a0-d772-11ee-9544-d39eccd5db7a"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1028,
+          "layoutY": 581
+        },
+        "type": "org.thingsboard.rule.engine.flow.TbRuleChainInputNode",
+        "name": "resourceAlarm",
+        "debugMode": false,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "ruleChainId": "ddb44c60-d78f-11ee-9544-d39eccd5db7a"
         }
       }
     ],
@@ -92,6 +137,21 @@
         "fromIndex": 0,
         "toIndex": 3,
         "type": "deviceAttr"
+      },
+      {
+        "fromIndex": 0,
+        "toIndex": 4,
+        "type": "mesErrorInfo"
+      },
+      {
+        "fromIndex": 0,
+        "toIndex": 5,
+        "type": "edcInfo"
+      },
+      {
+        "fromIndex": 0,
+        "toIndex": 6,
+        "type": "resourceAlarm"
       },
       {
         "fromIndex": 2,

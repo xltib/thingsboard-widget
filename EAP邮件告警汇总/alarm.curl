@@ -17,7 +17,20 @@
 
 - EAP告警汇总事件   `{"AlarmReportEvent":""}`                //收到该消息后，汇总告警信息，并发送邮件
 
+curl -v -X POST http://123.60.3.16:8080/api/v1/HaqhmbhUUVzhHjkReFgc/telemetry --header Content-Type:application/json --data "{zjx:1}"
 
+
+三号邮件设备
+UiDr5RgrKvX3NMF74GWY
+
+二号邮件设备
+WKcF8TkB5VO8ek6j0iOh
+
+一号邮件设备
+
+
+改变设备连接状态
+curl -v -X POST http://123.60.3.16:8080/api/v1/HaqhmbhUUVzhHjkReFgc/telemetry --header Content-Type:application/json --data "{EDCIsOK:'OffLine'}"
 
 ### MESEquipmentState   
 - Productive Time  
@@ -42,27 +55,16 @@
 - 
 
 
-### mqtt发送样例
-*    KK1nPQPdMTiClPbt6ZXa 为每个设备的安全凭证
+EAP告警汇总事件命令 
+`{"AlarmReportEvent":1}`
 
-` mosquitto_pub -d -q 1 -h localhost -p 1883 -t v1/devices/me/telemetry -u "KK1nPQPdMTiClPbt6ZXa" -m "{MESEquipmentState:Productive Time}" `
+资产需要的服务器端属性 初始化
 
+alarmsInfo {"info":[]}
+deviceAttr {} 
+edcInfo {}
+mesErrorInfo {}
+resourceAlarm {}
+{"一号邮件设备":{"info1":"2024-03-05 09:46:36","ts":1709603196204},"二号邮件设备":{"info2":"2024-03-05 09:46:42","ts":1709603202920}}
 
-
-资产需要的服务器端属性
-
-deviceAttr
-{
-  "二号邮件设备": { "area": "四线2F",  "belongTo": "XRAY","ip": "127.0.0.2" },
-  "三号邮件设备": { "area": "四线3F",  "belongTo": "晶圆切割", "ip": "127.0.0.3" }
-}
-
-
-
-
-alarmsInfo
-{"info":[{"name":"二号邮件设备","state":"offline"},{"name":"三号邮件设备","state":"online"}]}
-
-
-
-
+{"一号邮件设备":{"info1":"2024-03-05 09:46:36","ts":1709603196204},"二号邮件设备":{"info2":"2024-03-05 09:46:42","ts":1709603202920}}

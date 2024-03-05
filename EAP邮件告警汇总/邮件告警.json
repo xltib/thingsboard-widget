@@ -1,0 +1,274 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": ""
+    },
+    "name": "邮件告警",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 5,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 648,
+          "layoutY": 151
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbChangeOriginatorNode",
+        "name": "to asset",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "originatorSource": "RELATED",
+          "entityType": null,
+          "entityNamePattern": null,
+          "relationsQuery": {
+            "fetchLastLevelOnly": false,
+            "direction": "TO",
+            "maxLevel": 1,
+            "filters": [
+              {
+                "relationType": "Contains",
+                "entityTypes": [
+                  "ASSET"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 933,
+          "layoutY": 137
+        },
+        "type": "org.thingsboard.rule.engine.metadata.TbGetAttributesNode",
+        "name": "get all info",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 1,
+        "configuration": {
+          "tellFailureIfAbsent": false,
+          "fetchTo": "METADATA",
+          "clientAttributeNames": [],
+          "sharedAttributeNames": [],
+          "serverAttributeNames": [
+            "alarmsInfo",
+            "deviceAttr",
+            "mesErrorInfo",
+            "edcInfo",
+            "resourceAlarm"
+          ],
+          "latestTsKeyNames": [],
+          "getLatestValueWithTs": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1113,
+          "layoutY": 649
+        },
+        "type": "org.thingsboard.rule.engine.mail.TbMsgToEmailNode",
+        "name": "to email",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "fromTemplate": "haonan@sharetek.com.cn",
+          "toTemplate": "zhaojinxiu@sharetek.com.cn",
+          "ccTemplate": "wangzhiqiang@sharetek.com.cn",
+          "bccTemplate": "",
+          "subjectTemplate": "邮件告警报告",
+          "mailBodyType": "true",
+          "bodyTemplate": "<style>\n      h3 {\n        text-align: center;\n    }\n\n    table {\n        width: 100%;\n        border-collapse: collapse;\n       border: 0.5px solid #ccc;\n word-break:break-all\n    }\n\n    tr {\n        border-bottom: 0.5px #ccc solid;\n    }\n\n    th {\n        text-align: left;\n        background: #455e83;\n        color: #fff;\n        padding: 6px;\n    }\n\n    td {\n        border-bottom: 1px solid #ccc;\n        line-height: 30px;\n        padding: 6px;\n    }\n\ntable tbody tr td:nth-of-type(3) {\n font-size:14px;\n}\n</style>\n\n <h3>\n        EAP告警汇总\n    </h3>\n<table>\n  <thead>\n    <tr>\n      <th>机台ID</th>\n      <th>区域</th>\n    <th>时间段</th>\n      <th>所属模组</th>\n      <th>部署IP</th>\n     <th>设备类型</th>\n   <th>EAP状态</th>\n      <th>连接状态</th>\n   <th>持续时长</th>\n  <th>MES交互是否告警</th>\n  <th>MES交互异常与次数</th>\n  <th>EDC是否异常</th>\n  <th>最后数据采集时间</th>\n  <th>设备是否告警</th>\n  <th>告警类型与次数</th>\n    </tr>\n  </thead>\n  <tbody>\n    ${html}\n  </tbody>\n</table>\n\n"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1093,
+          "layoutY": 801
+        },
+        "type": "org.thingsboard.rule.engine.mail.TbSendEmailNode",
+        "name": "send",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "useSystemSmtpSettings": true,
+          "smtpHost": "localhost",
+          "smtpPort": 25,
+          "username": null,
+          "password": null,
+          "smtpProtocol": "smtp",
+          "timeout": 10000,
+          "enableTls": false,
+          "tlsVersion": "TLSv1.2",
+          "enableProxy": false,
+          "proxyHost": null,
+          "proxyPort": null,
+          "proxyUser": null,
+          "proxyPassword": null
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1046,
+          "layoutY": 508
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "format",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "scriptLang": "JS",
+          "jsScript": "var tableDom = '';\nvar deviceAttr = metadata.ss_deviceAttr;\nvar alarmsInfo = metadata.ss_alarmsInfo;\nvar processedMESError = metadata.processedMESError;\nif(processedMESError !== undefined) {\n    processedMESError = JSON.parse(processedMESError);\n}\nvar now_time = Date.now();\nif (deviceAttr != undefined && alarmsInfo != undefined) {\n    deviceAttr = JSON.parse(deviceAttr);\n    alarmsInfo = JSON.parse(alarmsInfo);\n    if (alarmsInfo.info && alarmsInfo.info.length > 0) {\n        for (var i = 0; i < alarmsInfo.info.length; i++) {\n            var deviceObj = deviceAttr[alarmsInfo.info[i]\n                .name]\n            var ts = +alarmsInfo.info[i].ts;\n            var eapState = alarmsInfo.info[i].eapState ?\n                alarmsInfo.info[i].eapState : '/';\n            var state = alarmsInfo.info[i].state ?\n                alarmsInfo.info[i].state : '/';\n            var deviceName = alarmsInfo.info[i].name;    \n            var currentMesErrorStr = JSON.stringify(processedMESError[deviceName]);\n            var isMESAlarm = currentMesErrorStr === '{}' || currentMesErrorStr === undefined ? '/' : '是';\n            var mesAlarmInfo = currentMesErrorStr === '{}' || currentMesErrorStr === undefined ? '/' :currentMesErrorStr;\n            //  持续时长计算\n            var gap = now_time - ts ? ((now_time - ts) / 60000).toFixed(\n                    2) + 'min' : '/';\n            tableDom += '<tr>' +\n                '<td>' + alarmsInfo.info[i].name + '</td>' +\n                '<td>' + deviceObj.area + '</td>' +\n                '<td>' + metadata.duration + '</td>' +\n                '<td>' + deviceObj.belongTo + '</td>' +\n                '<td>' + deviceObj.ip + '</td>' +\n                '<td>' + deviceObj.equipmentType + '</td>' +\n                '<td>' + eapState +\n                '</td>' +\n                '<td>' + state +\n                '</td>' +\n                '<td>' + gap+ '</td>' +\n                '<td>' + isMESAlarm + '</td>' +\n                '<td>' + mesAlarmInfo + '</td>' +\n                '<td>' + alarmsInfo.info[i].showEDCError + '</td>' +\n                 '<td>' + alarmsInfo.info[i].latestDC + '</td>' +\n                    '<td>' + alarmsInfo.info[i].isMESAlarm + '</td>' +\n                 '<td>' + alarmsInfo.info[i].mesAlarmInfo + '</td>' +\n                '</tr>';\n        }\n    }\n\n    metadata.html = tableDom;\n}\nmetadata.html = tableDom;\nreturn {\n    msg: msg,\n    metadata: metadata,\n    msgType: msgType\n\n};",
+          "tbelScript": "var htmlTable = '';\nvar deviceInfo = metadata.ss_deviceInfo;\nvar EAPConnectState = metadata.ss_EAPConnectState;\nif(deviceInfo != undefined){\n    deviceInfo = JSON.parse(deviceInfo);\n    EAPConnectState = JSON.parse(EAPConnectState);\n    \n    var deviceNames = Object.keys(deviceInfo);\n    for (var i = 0; i < deviceNames.length; i++) {\n        var device = deviceInfo[deviceNames[i]];\n        var eapState = EAPConnectState[deviceNames[i]];\n        htmlTable += '<tr>' +\n                        '<td>' + deviceNames[i] + '</td>' +\n                        '<td>' + device.ip + '</td>' +\n                        '<td>' + device.area + '</td>' +\n                        '<td>' + device.module + '</td>' +\n                        '<td>' + eapState.state + '</td>' +\n                     '</tr>';\n    }\n\n    metadata.html = htmlTable;\n}\n\nmetadata.html = htmlTable;\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 325,
+          "layoutY": 137
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "save",
+        "debugMode": false,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "defaultTTL": 0,
+          "skipLatestPersistence": false,
+          "useServerTs": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1208,
+          "layoutY": 132
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "add duration",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "scriptLang": "JS",
+          "jsScript": "var now = Date.now();\nvar start =  now - (3600 * 1000);\n\n// format it from timestamp to BeiJing time\nfunction formatTime(time) {\n    var date = new Date(time + 8 * 3600 * 1000);\n    return date.toJSON().substr(0, 19).replace('T', ' ').replace(/-/g, '-');\n}\n\nvar t1 = formatTime(start); \nvar t2 = formatTime(now); \n\nmetadata['duration'] = t1 + ' ~ ' +t2;\n\nreturn {\n    msg: msg,\n    metadata: metadata,\n    msgType: msgType\n\n};",
+          "tbelScript": "return {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1208,
+          "layoutY": 287
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "process Mes Error Info",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "scriptLang": "JS",
+          "jsScript": "var processedMESError = \"\";\nvar now = Date.now();\nvar finalStr = '{}';\nvar startTime = now - (1 * 60 * 60 * 1000);\n// save value to obj, simulate a Map Object\nfunction formatData(data) {\n  var formattedData = {};\n  for (var key in data) {\n    if (data.hasOwnProperty(key)) {\n      var tasks = data[key];\n      var taskCount = {};\n\n      for (var i = 0; i < tasks.length; i++) {\n        var task = tasks[i];\n        var taskId = Object.keys(task)[0];\n        var taskValue = task[taskId];\n        if(taskId >= startTime) {\n              if (taskCount.hasOwnProperty(taskValue)) {\n          taskCount[taskValue]++;\n        } else {\n          taskCount[taskValue] = 1;\n        }\n        }\n      \n      }\n\n      formattedData[key] = taskCount;\n    }\n  }\n\n  return formattedData;\n}\nif (metadata.ss_mesErrorInfo !== undefined) {\n    // 截取各设备的一小时内数据点\n    \n    var mesErrorObj = JSON.parse(metadata\n        .ss_mesErrorInfo)\n        \n    var output = formatData(mesErrorObj);    \n   \n}\nfinalStr = JSON.stringify(output);\nmetadata['processedMESError'] = finalStr;\nreturn {\n    msg: msg,\n    metadata: metadata,\n    msgType: msgType\n};",
+          "tbelScript": "return {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 430,
+          "layoutY": 422
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "添加EDC",
+        "debugMode": true,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "scriptLang": "JS",
+          "jsScript": "var alarmsObj = JSON.parse(metadata\n    .ss_alarmsInfo);\nvar edcObj = JSON.parse(metadata.ss_edcInfo);\n\nvar log = [];\nvar now = Date.now();\n// 四小时内是否有数采信息\nvar startTime = now - (4 * 60 * 60 * 1000);\n\nfunction getObjectByKey(data, key) {\n    if (data && data.hasOwnProperty(key)) {\n        return data[key];\n    }\n    return null;\n}\n\nfunction getFirstKeyValuePair(obj) {\n  if (obj && typeof obj === \"object\") {\n    var keys = Object.keys(obj);\n    if (keys.length > 0) {\n      var firstKey = keys[0];\n      var firstValue = obj[firstKey];\n      var result = {};\n      result[firstKey] = firstValue;\n      return JSON.stringify(result);\n    }\n  }\n  return '{}';\n}\n\n\nif (alarmsObj && alarmsObj.info && Array.isArray(alarmsObj\n        .info)) {\n    var infoArray = alarmsObj.info;\n    for (var i = 0; i < infoArray.length; i++) {\n        var item = infoArray[i];\n        var latestDC = '/';\n        var showEDCError = '/';\n        var EDCIsOk = item.EDCIsOk;\n        var EDC = getObjectByKey(edcObj, item.name);\n        if (EDCIsOk === undefined || EDCIsOk === true) {\n            if (EDC && EDC.ts) {\n                latestDC = EDC.ts >= startTime ? \"/\" : getFirstKeyValuePair(EDC)   // show  '/' if there is available data \n                    \n                showEDCError = EDC.ts >= startTime ? '/' :\n                    '是';\n            } else {\n                showEDCError = '是';\n                latestDC = '/';\n\n            }\n        } else if (EDCIsOk === false) {\n            showEDCError = '是';\n            latestDC = EDC && EDC.ts ?  getFirstKeyValuePair(EDC)  :\n                '/';\n        }\n        item.latestDC = latestDC;\n        item.showEDCError = showEDCError;\n\n    }\n}\n\n\nvar str = JSON.stringify(alarmsObj);\nmetadata['ss_alarmsInfo'] = str;\nreturn {\n    msg: msg,\n    metadata: metadata,\n    msgType: msgType\n};",
+          "tbelScript": "return {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 712,
+          "layoutY": 577
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "添加告警信息",
+        "debugMode": false,
+        "singletonMode": false,
+        "configurationVersion": 0,
+        "configuration": {
+          "scriptLang": "JS",
+          "jsScript": "var resourceAlarm = metadata.ss_resourceAlarm;\nvar alarmsInfo = metadata.ss_alarmsInfo;\nif (alarmsInfo != undefined) {\n    alarmsInfo = JSON.parse(alarmsInfo);\n} else {\n    alarmsInfo = {\n        'info': []\n    };\n}\nif (resourceAlarm != undefined) {\n    resourceAlarm = JSON.parse(resourceAlarm);\n} else {\n    resourceAlarm = {};\n}\nvar info = {};\nif (resourceAlarm) {\n    for (var key in resourceAlarm) {\n        var value = resourceAlarm[key];\n        var alarmDetails = {};\n        for (var i = 0; i < value.length; i++) {\n            var alarmKey = '报警' + value[i].AlarmID + '_' +\n                value[i].AlarmText;\n            alarmDetails[alarmKey] = (alarmDetails[\n                alarmKey] || 0) + 1;\n        }\n        info[key] = alarmDetails;\n    }\n}\n\nfor (var i = 0; i < alarmsInfo.info.length; i++) {\n    var name = alarmsInfo.info[i].name;\n    if (info[name]) {\n        alarmsInfo.info[i]['isMESAlarm'] = \"是\";\n        alarmsInfo.info[i]['mesAlarmInfo'] = JSON.stringify(info[name]);\n    }else {\n        alarmsInfo.info[i]['isMESAlarm'] = \"/\";\n        alarmsInfo.info[i]['mesAlarmInfo'] = \"/\";\n    }\n}\nvar str = JSON.stringify(alarmsInfo);\nmetadata['ss_alarmsInfo'] = str;\nreturn {\n    msg: msg,\n    metadata: metadata,\n    msgType: msgType\n};",
+          "tbelScript": "return {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 6,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 3,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 2,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 5,
+        "toIndex": 0,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 6,
+        "toIndex": 7,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 7,
+        "toIndex": 8,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 8,
+        "toIndex": 9,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 9,
+        "toIndex": 4,
+        "type": "Success"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
